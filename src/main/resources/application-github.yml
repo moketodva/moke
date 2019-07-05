@@ -113,7 +113,7 @@ moke:
     title: 标题
     description: 描述
     version: 1.0
-    terms-of-service-url: https://github.com/moketodva/moke-background
+    terms-of-service-url: https://github.com/moketodva/moke
     contact:
       name: 墨客
       url:
