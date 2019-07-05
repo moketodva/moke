@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.moke.generator.mapper.PathMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="cn.moke.generator.entity.po.Path" autoMapping="true">
+        <id column="id" property="id" />
+        <association property="permission" javaType="cn.moke.generator.entity.po.Permission" resultMap="cn.moke.generator.mapper.PermissionMapper.BaseResultMap" columnPrefix="permission_"/>
+        <collection property="roles" ofType="cn.moke.generator.entity.po.Role" resultMap="cn.moke.generator.mapper.RoleMapper.BaseResultMap" columnPrefix="role_"/>
+    </resultMap>
+
+    <select id="selectPathAndPermission" resultMap="BaseResultMap">
+        select path.*
+                ,p.id as permission_id
+                ,p.name as permission_name
+                ,p.description as permission_description
+                ,p.create_time as permission_createTime
+                ,p.create_user as permission_createUser
+                ,p.modify_time as permission_modifyTime
+                ,p.modify_user as permission_modifyUser
+        from tb_path path, tb_permission p
+        where path.permission_id = p.id
+            and path.is_active = '1'
+    </select>
+
+    <select id="selectPathAndRole" resultMap="BaseResultMap">
+        select path.*
+                ,r.id as role_id
+                ,r.name as role_name
+                ,r.description as role_description
+                ,r.create_time as role_createTime
+                ,r.create_user as role_createUser
+                ,r.modify_time as role_modifyTime
+                ,r.modify_user as role_modifyUser
+        from tb_path path, tb_permission p, tb_role_permission rp, tb_role r
+        where path.permission_id = p.id
+            and p.id = rp.permission_id
+            and rp.role_id = r.id
+            and path.is_active = '1'
+        order by path.ant_uri
+    </select>
+
+    <select id="selectCascadeList" resultMap="BaseResultMap">
+        select p.*
+                ,pm.id as permission_id
+                ,pm.name as permission_name
+                ,pm.description as permission_description
+                ,pm.create_time as permission_createTime
+                ,pm.create_user as permission_createUser
+                ,pm.modify_time as permission_modifyTime
+                ,pm.modify_user as permission_modifyUser
+        from tb_path p
+        left join tb_permission pm
+            on p.permission_id = pm.id
+        ${ew.customSqlSegment}
+    </select>
+</mapper>

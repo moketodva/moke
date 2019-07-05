@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.moke.generator.mapper.RouterMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="cn.moke.generator.entity.po.Router" autoMapping="true">
+        <id column="id" property="id" />
+        <association property="permission" javaType="cn.moke.generator.entity.po.Permission" resultMap="cn.moke.generator.mapper.PermissionMapper.BaseResultMap" columnPrefix="permission_"/>
+    </resultMap>
+
+    <select id="selectAllRouter" resultMap="BaseResultMap">
+        select r.*
+                ,p.id as permission_id
+                ,p.name as permission_name
+                ,p.description as permission_description
+                ,p.create_time as permission_createTime
+                ,p.create_user as permission_createUser
+                ,p.modify_time as permission_modifyTime
+                ,p.modify_user as permission_modifyUser
+        from tb_router r
+        left join tb_permission p
+            on r.permission_id = p.id
+        where r.type = '0'
+            and r.is_active = '1'
+        order by r.parent_id, r.sort_num
+    </select>
+
+    <select id="selectAllByRoleId" resultMap="BaseResultMap">
+        select r.*
+                ,case when p.id is null then 0
+                    else 1 end as checked
+        from tb_router r
+        left join (
+            select DISTINCT p.*
+            from tb_role r
+            inner join tb_role_permission rp
+                on r.id = rp.role_id
+                and r.id = #{roleId}
+            inner join tb_permission p
+                on rp.permission_id = p.id
+        ) p
+        on r.permission_id = p.id
+        where r.permission_id is not null
+            and r.is_active = '1'
+        order by r.parent_id, r.sort_num
+    </select>
+
+    <select id="selectAllRouterAndOperate" resultMap="BaseResultMap">
+        select r.*
+                ,p.id as permission_id
+                ,p.name as permission_name
+                ,p.description as permission_description
+                ,p.create_time as permission_createTime
+                ,p.create_user as permission_createUser
+                ,p.modify_time as permission_modifyTime
+                ,p.modify_user as permission_modifyUser
+        from tb_router r
+        left join tb_permission p
+            on r.permission_id = p.id
+        order by r.parent_id, r.sort_num
+    </select>
+
+    <select id="selectByUsername" resultMap="BaseResultMap">
+        select r.*
+        from tb_router r
+        inner join (
+            select DISTINCT p.*
+            from tb_user u
+            inner join tb_user_role ur
+                on u.id = ur.user_id
+                and u.username = #{username}
+            inner join tb_role r
+                on ur.role_id = r.id
+            inner join tb_role_permission rp
+                on r.id = rp.role_id
+            inner join tb_permission p
+                on rp.permission_id = p.id
+        ) p
+            on r.permission_id = p.id
+        where r.type = '0'
+            and r.is_active = '1'
+        order by r.parent_id, r.sort_num
+    </select>
+</mapper>

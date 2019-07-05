@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    status: 显示log4j2内部日志打印级别
+    monitorInterval: 设置监测配置文件修改的间隔时间,默认单位是s,最短间隔为5s
+-->
+<configuration status="warn" monitorInterval="30">
+    <properties>
+        <property name="logPath">log</property>
+    </properties>
+
+    <appenders>
+
+        <!--
+            name: 标识
+            target: SYSTEM_OUT 或 SYSTEM_ERR（用于输出异常）
+         -->
+        <console name="Console" target="SYSTEM_OUT">
+            <!--
+                符合过滤条件后能做的操作用三种,分别是ACCEPT（自己处理不会传递给后面的过滤器）、NEUTRAL（处理好交给后面的过滤器）、DENY（不处理也不交给后面的过滤器）
+                ThresholdFilter: 大于等于过滤的日志级别的日志才会过滤. （>=）
+                level: 过滤的日志级别
+                onMatch: 匹配成功后的操作
+                onMismatch: 匹配失败后的操作
+             -->
+            <ThresholdFilter level="TRACE" onMatch="ACCEPT" onMismatch="DENY"/>
+            <!-- 日志输出的格式 -->
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{5}[%file:%line] %msg%n"/>
+        </console>
+
+        <!--
+            name: 标识
+            fileName: 日志文件存储路径
+            append: 日志文件是否追加日志信息（默认true）
+        -->
+        <!--<File name="File" fileName="${logPath}/FileAppender/file-output.log" append="false">-->
+            <!--<PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{5}[%file:%line] %msg%n"/>-->
+        <!--</File>-->
+
+        <!--
+            name: 标识
+            fileName: 日志文件存储路径和文件名
+            filePattern: Rolling的时候文件转移路径
+         -->
+        <RollingFile name="SysError" fileName="${logPath}/sysError.log"
+                     filePattern="${logPath}/$${date:yyyy-MM-dd}/sysError-%d{yyyy-MM-dd HH}.%i.log.gz">
+            <Filters>
+                <ThresholdFilter level="ERROR" onMatch="ACCEPT" onMismatch="DENY"/>
+            </Filters>
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{5}[%file:%line] %msg%n"/>
+            <Policies>
+                <!--
+                    interval: 多长时间生成一个新日志文件（Rolling的间隔）,时间单位根据filePattern的时间精度来决定
+                    modulate: 是否调整时间,以0为起始,interval作为偏移
+                 -->
+                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+                <!--
+                    size: 设置日志文件容量
+                 -->
+                <SizeBasedTriggeringPolicy size="9MB"/>
+            </Policies>
+            <!-- 文件生成个数（默认7个） -->
+            <DefaultRolloverStrategy max="50"/>
+        </RollingFile>
+
+        <RollingFile name="BusinessInfo" fileName="${logPath}/businessInfo.log"
+                     filePattern="${logPath}/$${date:yyyy-MM-dd}/businessInfo-%d{yyyy-MM-dd HH}.%i.log.zip">
+            <Filters>
+                <ThresholdFilter level="INFO" onMatch="ACCEPT" onMismatch="DENY"/>
+            </Filters>
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{5}[%file:%line] %msg%n"/>
+            <Policies>
+                <!--
+                    interval: 多长时间生成一个新日志文件（Rolling的间隔）,时间单位根据filePattern的时间精度来决定
+                    modulate: 是否调整时间,以0为起始,interval作为偏移
+                 -->
+                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+                <!--
+                    size: 设置日志文件容量
+                 -->
+                <SizeBasedTriggeringPolicy size="9MB"/>
+            </Policies>
+            <!-- 文件生成个数（默认7个） -->
+            <DefaultRolloverStrategy max="50"/>
+        </RollingFile>
+    </appenders>
+
+    <loggers>
+        <root level="INFO">
+            <appender-ref ref="Console"/>
+        </root>
+        <AsyncLogger name="druid" level="TRACE" additivity="false">
+            <AppenderRef ref="Console"/>
+        </AsyncLogger>
+        <AsyncLogger name="cn.moke.generator.mapper" level="DEBUG" additivity="false">
+            <AppenderRef ref="Console"/>
+        </AsyncLogger>
+        <AsyncLogger name="org.springframework.security" level="INFO" additivity="false">
+            <AppenderRef ref="Console"/>
+        </AsyncLogger>
+    </loggers>
+
+</configuration>

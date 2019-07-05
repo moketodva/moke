@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.moke.generator.mapper.UserMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="cn.moke.generator.entity.po.User" autoMapping="true" >
+        <id column="id" property="id" />
+        <collection property="roles" ofType="cn.moke.generator.entity.po.Role" resultMap="cn.moke.generator.mapper.RoleMapper.BaseResultMap" columnPrefix="role_"/>
+        <collection property="permissions" ofType="cn.moke.generator.entity.po.Permission" resultMap="cn.moke.generator.mapper.PermissionMapper.BaseResultMap" columnPrefix="permission_"/>
+    </resultMap>
+
+    <select id="selectByUsername" resultMap="BaseResultMap">
+        select u.*
+                ,r.id as role_id
+                ,r.name as role_name
+                ,r.description as role_description
+                ,r.create_time as role_createTime
+                ,r.create_user as role_createUser
+                ,r.modify_time as role_modifyTime
+                ,r.modify_user as role_modifyUser
+                ,p.id as permission_id
+                ,p.name as permission_name
+                ,p.description as permission_description
+                ,p.create_time as permission_createTime
+                ,p.create_user as permission_createUser
+                ,p.modify_time as permission_modifyTime
+                ,p.modify_user as permission_modifyUser
+        from (
+            select *
+            from tb_user
+            where username = #{username}) u
+        left join tb_user_role ur
+            on u.id = ur.user_id
+        left join tb_role r
+            on r.id = ur.role_id
+        left join tb_role_permission rp
+            on r.id = rp.role_id
+        left join tb_permission p
+			on rp.permission_id = p.id
+    </select>
+
+    <select id="selectCascadeList" resultMap="BaseResultMap">
+        select u.*
+                ,r.id as role_id
+                ,r.name as role_name
+                ,r.description as role_description
+                ,r.create_time as role_createTime
+                ,r.create_user as role_createUser
+                ,r.modify_time as role_modifyTime
+                ,r.modify_user as role_modifyUser
+        from tb_user u
+        left join tb_user_role ur
+            on u.id = ur.user_id
+        left join tb_role r
+            on ur.role_id = r.id
+        ${ew.customSqlSegment}
+    </select>
+
+    <select id="selectCascadeById" resultMap="BaseResultMap">
+        select u.*
+                ,r.id as role_id
+                ,r.name as role_name
+                ,r.description as role_description
+                ,r.create_time as role_createTime
+                ,r.create_user as role_createUser
+                ,r.modify_time as role_modifyTime
+                ,r.modify_user as role_modifyUser
+                ,p.id as permission_id
+                ,p.name as permission_name
+                ,p.description as permission_description
+                ,p.create_time as permission_createTime
+                ,p.create_user as permission_createUser
+                ,p.modify_time as permission_modifyTime
+                ,p.modify_user as permission_modifyUser
+        from (
+            select *
+            from tb_user
+            where id = #{id}) u
+        left join tb_user_role ur
+            on u.id = ur.user_id
+        left join tb_role r
+            on r.id = ur.role_id
+		left join tb_role_permission rp
+            on r.id = rp.role_id
+        left join tb_permission p
+			on rp.permission_id = p.id
+    </select>
+</mapper>

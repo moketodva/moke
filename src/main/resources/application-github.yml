@@ -1,0 +1,125 @@
+
+server:
+  port: 8080
+  tomcat:
+    uri-encoding: utf-8
+mybatis-plus:
+  mapper-locations: classpath:mapper/**/*.xml
+  configuration:
+    map-underscore-to-camel-case: true
+    jdbc-type-for-null: null
+  global-config:
+    db-config:
+      id-type: id_worker_str
+      table-prefix: tb_
+    worker-id: 0
+spring:
+  application:
+    name: generator
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    public-key:
+    druid:
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      url: jdbc:mysql://xxx/school?useUnicode=true&characterEncoding=UTF-8&serverTimezone=GMT%2B8
+      username: root
+      password:
+      connection-properties: "config.decrypt=true;config.decrypt.key=${spring.datasource.public-key}"
+      initial-size: 20
+      min-idle: 20
+      max-active: 50
+      max-wait: 15000
+      validation-query: SELECT 1
+      test-while-idle: true
+      test-on-borrow: false
+      test-on-return: false
+      keep-alive: true
+      time-between-eviction-runs-millis: 600000
+      min-evictable-idle-time-millis: 3600000
+      web-stat-filter:
+        enabled: false
+      filters: stat,wall,slf4j
+      filter:
+        stat:
+          slow-sql-millis: 2000
+          log-slow-sql: true
+          merge-sql: false
+        config:
+          # druid对数据源密码加密使用的是config过滤器,这里是启用该过滤器的开关
+          enabled: true
+      stat-view-servlet:
+        enabled: true
+        url-pattern: /druid/*
+        login-username: admin
+        login-password: admin
+        reset-enable: false
+  redis:
+    host:
+    password:
+    port: 6379
+    timeout: 2000ms
+    jedis:
+      pool:
+        max-active: 20
+        max-idle: 8
+        min-idle: 1
+        max-wait: 2000ms
+  mvc:
+    throw-exception-if-no-handler-found: true
+  resources:
+    add-mappings: false
+  servlet:
+    multipart:
+      max-request-size: 3MB
+      max-file-size: 3MB
+pagehelper:
+  helper-dialect: mysql
+logging:
+  config: classpath:log4j2-prod.xml
+
+moke:
+  api:
+    weather:
+      url: https://ali-weather.showapi.com/ip-to-weather?ip={ip}&need3HourForcast={need3HourForcast}&needAlarm={needAlarm}&needHourData={needHourData}&needIndex={needIndex}&needMoreDay={needMoreDay}
+      app-code:
+  authority:
+    # 模式（0：开发or测试,取消认证; 1：生产,启动认证）;默认0
+    mode: 1
+    # 基于角色还是基于权限进行接口权限控制（0：角色，1：权限）; 默认0
+    unit: 1
+    # 登录uri
+    login-uri: /auth/login
+    # 注销uri
+    logout-uri: /auth/logout
+    # 是否自动刷新令牌
+    is-auto-fresh: true
+    # jwt 令牌多长失效
+    token-expire-time-second: 43200
+    # jwt 令牌剩下多少时间自动使用新令牌替换旧令牌（自动刷新令牌）
+    token-fresh-time-second: 10800
+  sms:
+    access-key-Id:
+    access-key-secret:
+    # 短信签名
+    sign-name:
+    # 短信模板编号
+    template-code: SMS_139236140
+    # 连接超时
+    connection-timeout: 10000
+    # 读取超时
+    read-timeout: 10000
+  swagger:
+    base-package: cn.moke.generator.controller
+    title: 标题
+    description: 描述
+    version: 1.0
+    terms-of-service-url: https://github.com/moketodva/moke-background
+    contact:
+      name: 墨客
+      url:
+      email:
+  upload:
+    access-key:
+    secret-key:
+    bucket:
+    domain:
